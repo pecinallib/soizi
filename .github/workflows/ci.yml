@@ -51,6 +51,8 @@ jobs:
       - name: Generate Prisma Client
         working-directory: ./backend
         run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://soizi:soizi123@localhost:5432/soizi_test
 
       - name: Lint
         working-directory: ./backend
