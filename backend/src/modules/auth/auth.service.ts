@@ -29,7 +29,9 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async register(data: RegisterDTO) {
+  async register(
+    data: RegisterDTO,
+  ): Promise<{ user: object; accessToken: string; refreshToken: string }> {
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
@@ -61,7 +63,9 @@ export class AuthService {
     return { user, ...tokens };
   }
 
-  async login(data: LoginDTO) {
+  async login(
+    data: LoginDTO,
+  ): Promise<{ user: object; accessToken: string; refreshToken: string }> {
     const user = await prisma.user.findUnique({
       where: { email: data.email },
     });
@@ -91,7 +95,7 @@ export class AuthService {
     };
   }
 
-  async refresh(refreshToken: string) {
+  async refresh(refreshToken: string): Promise<TokenPair> {
     try {
       const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as UserPayload;
 
@@ -121,7 +125,7 @@ export class AuthService {
     }
   }
 
-  async me(userId: string) {
+  async me(userId: string): Promise<object> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {

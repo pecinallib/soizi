@@ -6,7 +6,7 @@ import { apiResponse } from '../../utils';
 const authService = new AuthService();
 
 export class AuthController {
-  async register(req: Request, res: Response, next: NextFunction) {
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = registerSchema.parse(req.body);
       const result = await authService.register(data);
@@ -22,7 +22,7 @@ export class AuthController {
     }
   }
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = loginSchema.parse(req.body);
       const result = await authService.login(data);
@@ -39,7 +39,7 @@ export class AuthController {
     }
   }
 
-  async refresh(req: Request, res: Response, next: NextFunction) {
+  async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = refreshSchema.parse(req.body);
       const tokens = await authService.refresh(data.refreshToken);
@@ -54,7 +54,7 @@ export class AuthController {
     }
   }
 
-  async me(req: Request, res: Response, next: NextFunction) {
+  async me(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.userId as string;
       const user = await authService.me(userId);
