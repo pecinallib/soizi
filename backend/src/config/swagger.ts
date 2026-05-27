@@ -176,6 +176,109 @@ const swaggerDocument = {
           401: { description: 'Token inválido ou não fornecido' },
         },
       },
+      '/api/remittance': {
+        post: {
+          tags: ['Remittance'],
+          summary: 'Criar remessa',
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['originCurrency', 'targetCurrency', 'originAmount'],
+                  properties: {
+                    originCurrency: { type: 'string', example: 'BRL' },
+                    targetCurrency: { type: 'string', example: 'USD' },
+                    originAmount: { type: 'number', example: 1000 },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            201: { description: 'Remessa criada com sucesso' },
+            400: { description: 'Dados inválidos ou moeda não suportada' },
+            401: { description: 'Token inválido ou não fornecido' },
+          },
+        },
+        get: {
+          tags: ['Remittance'],
+          summary: 'Listar remessas',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'status',
+              in: 'query',
+              schema: {
+                type: 'string',
+                enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED'],
+              },
+              description: 'Filtrar por status',
+            },
+            {
+              name: 'page',
+              in: 'query',
+              schema: { type: 'integer', default: 1 },
+              description: 'Página',
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              schema: { type: 'integer', default: 10 },
+              description: 'Itens por página',
+            },
+          ],
+          responses: {
+            200: { description: 'Remessas listadas com sucesso' },
+            401: { description: 'Token inválido ou não fornecido' },
+          },
+        },
+      },
+      '/api/remittance/{id}': {
+        get: {
+          tags: ['Remittance'],
+          summary: 'Detalhes da remessa',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string', format: 'uuid' },
+              description: 'ID da remessa',
+            },
+          ],
+          responses: {
+            200: { description: 'Detalhes da remessa' },
+            404: { description: 'Remessa não encontrada' },
+            401: { description: 'Token inválido ou não fornecido' },
+          },
+        },
+      },
+      '/api/remittance/{id}/cancel': {
+        patch: {
+          tags: ['Remittance'],
+          summary: 'Cancelar remessa',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string', format: 'uuid' },
+              description: 'ID da remessa',
+            },
+          ],
+          responses: {
+            200: { description: 'Remessa cancelada com sucesso' },
+            400: { description: 'Remessa não pode ser cancelada' },
+            404: { description: 'Remessa não encontrada' },
+            401: { description: 'Token inválido ou não fornecido' },
+          },
+        },
+      },
     },
   },
 };
