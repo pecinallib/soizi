@@ -3,6 +3,7 @@ import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './config';
 import { authRoutes } from './modules/auth';
+import { exchangeRoutes } from './modules/exchange';
 import { errorHandler } from './middlewares';
 
 const app = express();
@@ -21,6 +22,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/exchange', exchangeRoutes);
 
 app.use(errorHandler);
 
