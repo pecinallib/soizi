@@ -20,32 +20,6 @@ const swaggerDocument = {
         bearerFormat: 'JWT',
       },
     },
-    schemas: {
-      Explanation: {
-        type: 'object',
-        properties: {
-          title: { type: 'string' },
-          description: { type: 'string' },
-          example: { type: 'string' },
-        },
-      },
-      User: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          name: { type: 'string' },
-          email: { type: 'string', format: 'email' },
-          createdAt: { type: 'string', format: 'date-time' },
-        },
-      },
-      TokenPair: {
-        type: 'object',
-        properties: {
-          accessToken: { type: 'string' },
-          refreshToken: { type: 'string' },
-        },
-      },
-    },
   },
   paths: {
     '/health': {
@@ -53,9 +27,7 @@ const swaggerDocument = {
         tags: ['Health'],
         summary: 'Health check',
         responses: {
-          200: {
-            description: 'API funcionando',
-          },
+          200: { description: 'API funcionando' },
         },
       },
     },
@@ -71,21 +43,17 @@ const swaggerDocument = {
                 type: 'object',
                 required: ['name', 'email', 'password'],
                 properties: {
-                  name: { type: 'string', minLength: 2, example: 'Codec' },
-                  email: { type: 'string', format: 'email', example: 'codec@test.com' },
-                  password: { type: 'string', minLength: 6, example: '123456' },
+                  name: { type: 'string', example: 'Codec' },
+                  email: { type: 'string', example: 'codec@test.com' },
+                  password: { type: 'string', example: '123456' },
                 },
               },
             },
           },
         },
         responses: {
-          201: {
-            description: 'Usuário registrado com sucesso',
-          },
-          409: {
-            description: 'Email já cadastrado',
-          },
+          201: { description: 'Usuário registrado com sucesso' },
+          409: { description: 'Email já cadastrado' },
         },
       },
     },
@@ -101,7 +69,7 @@ const swaggerDocument = {
                 type: 'object',
                 required: ['email', 'password'],
                 properties: {
-                  email: { type: 'string', format: 'email', example: 'codec@test.com' },
+                  email: { type: 'string', example: 'codec@test.com' },
                   password: { type: 'string', example: '123456' },
                 },
               },
@@ -109,12 +77,8 @@ const swaggerDocument = {
           },
         },
         responses: {
-          200: {
-            description: 'Login realizado com sucesso',
-          },
-          401: {
-            description: 'Email ou senha inválidos',
-          },
+          200: { description: 'Login realizado com sucesso' },
+          401: { description: 'Email ou senha inválidos' },
         },
       },
     },
@@ -137,12 +101,8 @@ const swaggerDocument = {
           },
         },
         responses: {
-          200: {
-            description: 'Token renovado com sucesso',
-          },
-          401: {
-            description: 'Refresh token inválido',
-          },
+          200: { description: 'Token renovado com sucesso' },
+          401: { description: 'Refresh token inválido' },
         },
       },
     },
@@ -152,12 +112,68 @@ const swaggerDocument = {
         summary: 'Dados do usuário autenticado',
         security: [{ bearerAuth: [] }],
         responses: {
-          200: {
-            description: 'Dados do usuário',
+          200: { description: 'Dados do usuário' },
+          401: { description: 'Token inválido ou não fornecido' },
+        },
+      },
+    },
+    '/api/exchange/currencies': {
+      get: {
+        tags: ['Exchange'],
+        summary: 'Listar moedas suportadas',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: 'Lista de moedas suportadas' },
+          401: { description: 'Token inválido ou não fornecido' },
+        },
+      },
+    },
+    '/api/exchange/rates/{base}': {
+      get: {
+        tags: ['Exchange'],
+        summary: 'Obter taxas de câmbio',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'base',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', example: 'USD' },
+            description: 'Código ISO 4217 da moeda base (ex: USD, BRL, EUR)',
           },
-          401: {
-            description: 'Token inválido ou não fornecido',
+        ],
+        responses: {
+          200: { description: 'Taxas de câmbio obtidas com sucesso' },
+          400: { description: 'Moeda inválida' },
+          401: { description: 'Token inválido ou não fornecido' },
+        },
+      },
+    },
+    '/api/exchange/convert': {
+      post: {
+        tags: ['Exchange'],
+        summary: 'Converter moedas',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['from', 'to', 'amount'],
+                properties: {
+                  from: { type: 'string', example: 'BRL' },
+                  to: { type: 'string', example: 'USD' },
+                  amount: { type: 'number', example: 1000 },
+                },
+              },
+            },
           },
+        },
+        responses: {
+          200: { description: 'Conversão realizada com sucesso' },
+          400: { description: 'Dados inválidos ou moeda não suportada' },
+          401: { description: 'Token inválido ou não fornecido' },
         },
       },
     },
