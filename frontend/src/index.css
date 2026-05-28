@@ -1,26 +1,77 @@
 @import 'tailwindcss';
 
-:root {
-  --color-primary: #0f766e;
-  --color-primary-light: #14b8a6;
-  --color-primary-dark: #0d5a54;
+@theme {
+  /* SoIzi Green */
+  --color-primary: #006d43;
+  --color-primary-container: #00d084;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #005331;
+  --color-primary-light: #31e193;
+
+  /* Trust Navy */
   --color-secondary: #1e293b;
-  --color-accent: #f59e0b;
-  --color-background: #f8fafc;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d5e0f8;
+
+  /* Action Blue */
+  --color-tertiary: #3b82f6;
+  --color-on-tertiary: #ffffff;
+
+  /* Surfaces */
+  --color-background: #f8f9ff;
   --color-surface: #ffffff;
-  --color-text: #0f172a;
+  --color-surface-dim: #cbdbf5;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-surface-container-low: #eff4ff;
+
+  /* Text */
+  --color-text: #0b1c30;
   --color-text-muted: #64748b;
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #3c4a40;
+
+  /* Borders */
   --color-border: #e2e8f0;
-  --color-error: #ef4444;
-  --color-success: #22c55e;
+  --color-outline: #6c7b6f;
+  --color-outline-variant: #bacbbd;
+
+  /* Feedback */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-success: #00d084;
+
+  /* Accent */
+  --color-accent: #f59e0b;
+
+  /* Typography */
+  --font-heading: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
 }
 
+/* Dark mode */
 .dark {
   --color-background: #0f172a;
   --color-surface: #1e293b;
-  --color-text: #f1f5f9;
+  --color-surface-dim: #162032;
+  --color-surface-container: #1a2740;
+  --color-surface-container-high: #213145;
+  --color-surface-container-low: #152030;
+  --color-text: #eaf1ff;
   --color-text-muted: #94a3b8;
+  --color-on-surface: #eaf1ff;
+  --color-on-surface-variant: #bacbbd;
   --color-border: #334155;
+  --color-outline: #8b9b8f;
+  --color-outline-variant: #3c4a40;
 }
 
 * {
@@ -30,12 +81,15 @@
 }
 
 body {
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-body);
   background-color: var(--color-background);
   color: var(--color-text);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular nums for financial data */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
