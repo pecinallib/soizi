@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
-import { Login, Register, Dashboard } from '@/pages';
+import { Login, Register, Dashboard, Converter } from '@/pages';
 import type { ReactNode } from 'react';
 
 const queryClient = new QueryClient({
@@ -82,6 +82,14 @@ function AppRoutes(): React.JSX.Element {
         }
       />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route
+        path="/converter"
+        element={
+          <ProtectedRoute>
+            <Converter />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
