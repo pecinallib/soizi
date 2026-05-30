@@ -9,6 +9,7 @@ import {
   Converter,
   Glossary,
   Simulator,
+  SimulationDetails,
 } from '@/pages';
 import type { ReactNode } from 'react';
 
@@ -110,6 +111,14 @@ function AppRoutes(): React.JSX.Element {
         element={
           <ProtectedRoute>
             <Simulator />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/simulation/:id"
+        element={
+          <ProtectedRoute>
+            <SimulationDetails />
           </ProtectedRoute>
         }
       />
