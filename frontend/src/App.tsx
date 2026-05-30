@@ -2,7 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
-import { Login, Register, Dashboard, Converter, Glossary } from '@/pages';
+import {
+  Login,
+  Register,
+  Dashboard,
+  Converter,
+  Glossary,
+  Simulator,
+} from '@/pages';
 import type { ReactNode } from 'react';
 
 const queryClient = new QueryClient({
@@ -95,6 +102,14 @@ function AppRoutes(): React.JSX.Element {
         element={
           <ProtectedRoute>
             <Glossary />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/simulator"
+        element={
+          <ProtectedRoute>
+            <Simulator />
           </ProtectedRoute>
         }
       />
