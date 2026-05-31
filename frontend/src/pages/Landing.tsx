@@ -8,7 +8,7 @@ import {
   SIMULATOR_STEPS,
   SOIZI_METHOD_TERMS,
   GAMIFICATION_CARDS,
-  STATS,
+  MARQUEE_IMAGES,
   API_HIGHLIGHTS,
   FAQ,
   TESTIMONIALS,
@@ -210,19 +210,28 @@ export function Landing(): React.JSX.Element {
         </div>
       </section>
 
-      {/* ── Stats strip ── */}
-      <section className="border-y border-border bg-surface">
-        <div className="max-w-300 mx-auto w-full px-5 md:px-10 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {STATS.map((stat) => (
-              <div key={stat.label}>
-                <p className="font-heading text-2xl md:text-3xl font-bold text-primary">
-                  {stat.value}
-                </p>
-                <p className="text-sm text-text-muted mt-1">{stat.label}</p>
-              </div>
-            ))}
-          </div>
+      {/* ── Marquee ── */}
+      <section className="border-y border-border relative overflow-hidden h-44">
+        {/* Fade esquerda */}
+        <div className="absolute inset-y-0 left-0 w-32 bg-linear-to-r from-background to-transparent z-10 pointer-events-none" />
+        {/* Fade direita */}
+        <div className="absolute inset-y-0 right-0 w-32 bg-linear-to-l from-background to-transparent z-10 pointer-events-none" />
+
+        {/* Track — duplicado para loop imperceptível */}
+        <div className="flex h-full animate-marquee">
+          {[...MARQUEE_IMAGES, ...MARQUEE_IMAGES].map((img, idx) => (
+            <div key={idx} className="relative h-full w-72 shrink-0">
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="h-full w-full object-cover"
+              />
+              {/* Sombra esquerda da imagem */}
+              <div className="absolute inset-y-0 left-0 w-10 bg-linear-to-r from-black/60 to-transparent pointer-events-none" />
+              {/* Sombra direita da imagem */}
+              <div className="absolute inset-y-0 right-0 w-10 bg-linear-to-l from-black/60 to-transparent pointer-events-none" />
+            </div>
+          ))}
         </div>
       </section>
 
