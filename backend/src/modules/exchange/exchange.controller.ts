@@ -40,6 +40,15 @@ export class ExchangeController {
     }
   }
 
+  async getPreview(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const rates = await exchangeService.getPreviewRates();
+      apiResponse(res, 200, 'Taxas de prévia obtidas com sucesso', rates);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getSupportedCurrencies(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const currencies = await exchangeService.getSupportedCurrencies();
