@@ -5,3 +5,4 @@ export { Converter } from './Converter';
 export { Glossary } from './Glossary';
 export { Simulator } from './Simulator';
 export { SimulationDetails } from './SimulationDetails';
+export { Landing } from './Landing';

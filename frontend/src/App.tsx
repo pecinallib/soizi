@@ -10,6 +10,7 @@ import {
   Glossary,
   Simulator,
   SimulationDetails,
+  Landing,
 } from '@/pages';
 import type { ReactNode } from 'react';
 
@@ -65,6 +66,14 @@ function PublicRoute({ children }: { children: ReactNode }): React.JSX.Element {
 function AppRoutes(): React.JSX.Element {
   return (
     <Routes>
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <Landing />
+          </PublicRoute>
+        }
+      />
       <Route
         path="/login"
         element={

@@ -97,4 +97,19 @@ export class ExchangeService {
     const rates = await this.getRates('USD');
     return Object.keys(rates.rates).sort();
   }
+
+  async getPreviewRates(): Promise<Record<string, string>> {
+    const PREVIEW_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'ARS'];
+    const { rates } = await this.getRates('BRL');
+
+    const preview: Record<string, string> = {};
+    for (const code of PREVIEW_CURRENCIES) {
+      const rate = rates[code];
+      if (rate && rate > 0) {
+        const brlPerUnit = 1 / rate;
+        preview[code] = brlPerUnit < 1 ? brlPerUnit.toFixed(3) : brlPerUnit.toFixed(2);
+      }
+    }
+    return preview;
+  }
 }
