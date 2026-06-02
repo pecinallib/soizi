@@ -167,6 +167,19 @@ export const GAMIFICATION_CARDS = [
   },
 ] as const;
 
+export const MARQUEE_IMAGES = [
+  { src: '/lp/faixa/newyork.jpg', alt: 'Nova York' },
+  { src: '/lp/faixa/dolar.jpg', alt: 'Dólar' },
+  { src: '/lp/faixa/londres.jpg', alt: 'Londres' },
+  { src: '/lp/faixa/bank.jpg', alt: 'Banco' },
+  { src: '/lp/faixa/toquio.jpg', alt: 'Tóquio' },
+  { src: '/lp/faixa/real.jpg', alt: 'Real Brasileiro' },
+  { src: '/lp/faixa/saopaulo.jpg', alt: 'São Paulo' },
+  { src: '/lp/faixa/airnpot.jpg', alt: 'Aeroporto' },
+  { src: '/lp/faixa/map.jpg', alt: 'Mapa' },
+  { src: '/lp/faixa/globo.jpg', alt: 'Globo' },
+] as const;
+
 export const STATS = [
   { value: '+30', label: 'Moedas disponíveis' },
   { value: 'Real-time', label: 'Taxas via API' },
