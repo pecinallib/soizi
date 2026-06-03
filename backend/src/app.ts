@@ -6,6 +6,9 @@ import { authRoutes } from './modules/auth';
 import { exchangeRoutes } from './modules/exchange';
 import { remittanceRoutes } from './modules/remittance';
 import { explanationRoutes } from './modules/explanation';
+import { walletRoutes } from './modules/wallet';
+import { stockRoutes } from './modules/stock';
+import { portfolioRoutes } from './modules/portfolio';
 import { errorHandler } from './middlewares';
 
 const app = express();
@@ -27,6 +30,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/exchange', exchangeRoutes);
 app.use('/api/remittance', remittanceRoutes);
 app.use('/api/explanation', explanationRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/stocks', stockRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 
 app.use(errorHandler);
 
