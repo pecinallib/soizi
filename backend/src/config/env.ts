@@ -18,6 +18,8 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 
   EXCHANGE_API_URL: z.string().url().default('https://api.exchangerate-api.com/v4/latest'),
+
+  FINNHUB_API_KEY: z.string().min(1),
 });
 
 const parsed = envSchema.safeParse(process.env);
