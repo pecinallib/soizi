@@ -4,7 +4,10 @@ import { prisma } from '../../config/database';
 import { env } from '../../config/env';
 import { redis } from '../../config/redis';
 import { ApiError } from '../../utils';
+import { WalletService } from '../wallet/wallet.service';
 import type { RegisterDTO, LoginDTO } from './auth.schema';
+
+const walletService = new WalletService();
 
 interface TokenPair {
   accessToken: string;
@@ -59,6 +62,7 @@ export class AuthService {
     const tokens = this.generateTokens({ id: user.id, email: user.email });
 
     await redis.set(`refresh:${user.id}`, tokens.refreshToken, 'EX', 7 * 24 * 60 * 60);
+    await walletService.createInitialWallet(user.id);
 
     return { user, ...tokens };
   }
