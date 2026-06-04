@@ -36,22 +36,52 @@ export class RemittanceService {
       data.originAmount,
     );
 
-    const remittance = await prisma.remittance.create({
-      data: {
-        userId,
-        originCurrency: data.originCurrency,
-        targetCurrency: data.targetCurrency,
-        originAmount: data.originAmount,
-        targetAmount: conversion.convertedAmount,
-        exchangeRate: conversion.exchangeRate,
-        fee: conversion.fee,
-        spread: conversion.spread,
-        totalCost: conversion.totalCost,
-        status: 'PENDING',
-      },
-    });
+    const totalCost = conversion.totalCost;
 
-    return this.formatRemittance(remittance);
+    return prisma.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findUnique({ where: { userId } });
+
+      if (!wallet) throw ApiError.notFound('Carteira não encontrada');
+
+      if (wallet.balance.lessThan(totalCost)) {
+        throw ApiError.badRequest(
+          `Saldo insuficiente. Necessário: R$${totalCost.toFixed(2)}, disponível: R$${wallet.balance.toFixed(2)}`,
+        );
+      }
+
+      const remittance = await tx.remittance.create({
+        data: {
+          userId,
+          originCurrency: data.originCurrency,
+          targetCurrency: data.targetCurrency,
+          originAmount: data.originAmount,
+          targetAmount: conversion.convertedAmount,
+          exchangeRate: conversion.exchangeRate,
+          fee: conversion.fee,
+          spread: conversion.spread,
+          totalCost: conversion.totalCost,
+          status: 'PENDING',
+        },
+      });
+
+      const newBalance = wallet.balance.sub(totalCost);
+
+      await tx.wallet.update({ where: { id: wallet.id }, data: { balance: newBalance } });
+
+      await tx.walletTransaction.create({
+        data: {
+          walletId: wallet.id,
+          type: 'REMITTANCE',
+          amount: totalCost,
+          balanceBefore: wallet.balance,
+          balanceAfter: newBalance,
+          description: `Remessa de ${data.originAmount} ${data.originCurrency} para ${data.targetCurrency}`,
+          relatedId: remittance.id,
+        },
+      });
+
+      return this.formatRemittance(remittance);
+    });
   }
 
   async list(userId: string, filters: ListRemittancesDTO): Promise<ListResponse> {

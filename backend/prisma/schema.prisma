@@ -6,38 +6,113 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─── Usuário ────────────────────────────────────────────────────────────────
+
 model User {
-  id           String       @id @default(uuid())
-  name         String
-  email        String       @unique
-  password     String
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
-  remittances  Remittance[]
+  id                String             @id @default(uuid())
+  name              String
+  email             String             @unique
+  password          String
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  remittances       Remittance[]
+  wallet            Wallet?
+  stockTransactions StockTransaction[]
+  portfolios        Portfolio[]
 
   @@map("users")
 }
 
+// ─── Carteira ────────────────────────────────────────────────────────────────
+
+model Wallet {
+  id           String              @id @default(uuid())
+  userId       String              @unique @map("user_id")
+  balance      Decimal             @default(50000) @db.Decimal(18, 2)
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id             String                @id @default(uuid())
+  walletId       String                @map("wallet_id")
+  type           WalletTransactionType
+  amount         Decimal               @db.Decimal(18, 2)
+  balanceBefore  Decimal               @map("balance_before") @db.Decimal(18, 2)
+  balanceAfter   Decimal               @map("balance_after") @db.Decimal(18, 2)
+  description    String
+  counterpartyId String?               @map("counterparty_id")
+  relatedId      String?               @map("related_id")
+  createdAt      DateTime              @default(now()) @map("created_at")
+  wallet         Wallet                @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
+  @@map("wallet_transactions")
+}
+
+// ─── Ações / Portfolio ───────────────────────────────────────────────────────
+
+model Portfolio {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  symbol      String
+  quantity    Decimal  @db.Decimal(18, 6)
+  avgPriceBRL Decimal  @map("avg_price_brl") @db.Decimal(18, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, symbol])
+  @@index([userId])
+  @@map("portfolios")
+}
+
+model StockTransaction {
+  id           String               @id @default(uuid())
+  userId       String               @map("user_id")
+  symbol       String
+  type         StockTransactionType
+  quantity     Decimal              @db.Decimal(18, 6)
+  priceUSD     Decimal              @map("price_usd") @db.Decimal(18, 4)
+  priceBRL     Decimal              @map("price_brl") @db.Decimal(18, 2)
+  exchangeRate Decimal              @map("exchange_rate") @db.Decimal(18, 4)
+  totalBRL     Decimal              @map("total_brl") @db.Decimal(18, 2)
+  createdAt    DateTime             @default(now()) @map("created_at")
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([symbol])
+  @@map("stock_transactions")
+}
+
+// ─── Remessa ─────────────────────────────────────────────────────────────────
+
 model Remittance {
-  id              String           @id @default(uuid())
-  userId          String           @map("user_id")
-  originCurrency  String           @map("origin_currency")
-  targetCurrency  String           @map("target_currency")
-  originAmount    Decimal          @map("origin_amount") @db.Decimal(15, 2)
-  targetAmount    Decimal          @map("target_amount") @db.Decimal(15, 2)
-  exchangeRate    Decimal          @map("exchange_rate") @db.Decimal(15, 6)
-  fee             Decimal          @db.Decimal(15, 2)
-  spread          Decimal          @db.Decimal(5, 4)
-  totalCost       Decimal          @map("total_cost") @db.Decimal(15, 2)
-  status          RemittanceStatus @default(PENDING)
-  createdAt       DateTime         @default(now()) @map("created_at")
-  updatedAt       DateTime         @updatedAt @map("updated_at")
-  user            User             @relation(fields: [userId], references: [id])
+  id             String           @id @default(uuid())
+  userId         String           @map("user_id")
+  originCurrency String           @map("origin_currency")
+  targetCurrency String           @map("target_currency")
+  originAmount   Decimal          @map("origin_amount") @db.Decimal(15, 2)
+  targetAmount   Decimal          @map("target_amount") @db.Decimal(15, 2)
+  exchangeRate   Decimal          @map("exchange_rate") @db.Decimal(15, 6)
+  fee            Decimal          @db.Decimal(15, 2)
+  spread         Decimal          @db.Decimal(5, 4)
+  totalCost      Decimal          @map("total_cost") @db.Decimal(15, 2)
+  status         RemittanceStatus @default(PENDING)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  user           User             @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([status])
   @@map("remittances")
 }
+
+// ─── Conteúdo educativo ──────────────────────────────────────────────────────
 
 model Explanation {
   id          String   @id @default(uuid())
@@ -52,6 +127,24 @@ model Explanation {
 
   @@index([category])
   @@map("explanations")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum WalletTransactionType {
+  INITIAL_CREDIT
+  CREDIT
+  DEBIT
+  TRANSFER_IN
+  TRANSFER_OUT
+  STOCK_BUY
+  STOCK_SELL
+  REMITTANCE
+}
+
+enum StockTransactionType {
+  BUY
+  SELL
 }
 
 enum RemittanceStatus {
