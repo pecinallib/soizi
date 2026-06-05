@@ -82,3 +82,41 @@ export interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
+
+export interface Wallet {
+  id: string;
+  balance: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WalletTransaction {
+  id: string;
+  type: 'INITIAL_CREDIT' | 'TRANSFER_OUT' | 'TRANSFER_IN' | 'STOCK_BUY' | 'STOCK_SELL' | 'REMITTANCE_DEBIT';
+  amount: string;
+  balanceBefore: string;
+  balanceAfter: string;
+  description: string;
+  counterpartyId: string | null;
+  relatedId: string | null;
+  createdAt: string;
+}
+
+export interface PortfolioPosition {
+  symbol: string;
+  quantity: string;
+  avgPriceBRL: string;
+  currentPriceUSD: string;
+  currentPriceBRL: string;
+  currentValueBRL: string;
+  investedBRL: string;
+  pnlBRL: string;
+  pnlPercent: string;
+  changePercent: string;
+  updatedAt: string;
+}
+
+export interface Portfolio {
+  positions: PortfolioPosition[];
+  totalInvestedBRL: string;
+}
