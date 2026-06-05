@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  LuArrowLeftRight,
+  LuGlobe,
+  LuWallet,
+  LuTrendingUp,
+  LuBookOpen,
+} from 'react-icons/lu';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/services/api';
 import { Card, Button, ExplanationTrigger } from '@/components/ui';
@@ -186,7 +193,7 @@ export function Dashboard(): React.JSX.Element {
             <Card className="hover:border-primary-container transition-colors cursor-pointer h-full">
               <div className="flex flex-col items-center text-center gap-2 py-1">
                 <div className="w-10 h-10 bg-primary-container/20 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">💱</span>
+                  <LuArrowLeftRight size={20} className="text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-on-surface text-sm">Conversor</h3>
@@ -200,7 +207,7 @@ export function Dashboard(): React.JSX.Element {
             <Card className="hover:border-primary-container transition-colors cursor-pointer h-full">
               <div className="flex flex-col items-center text-center gap-2 py-1">
                 <div className="w-10 h-10 bg-primary-container/20 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">🌍</span>
+                  <LuGlobe size={20} className="text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-on-surface text-sm">Simular Envio</h3>
@@ -214,7 +221,7 @@ export function Dashboard(): React.JSX.Element {
             <Card className="hover:border-primary-container transition-colors cursor-pointer h-full">
               <div className="flex flex-col items-center text-center gap-2 py-1">
                 <div className="w-10 h-10 bg-primary-container/20 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">👛</span>
+                  <LuWallet size={20} className="text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-on-surface text-sm">Carteira</h3>
@@ -228,7 +235,7 @@ export function Dashboard(): React.JSX.Element {
             <Card className="hover:border-primary-container transition-colors cursor-pointer h-full">
               <div className="flex flex-col items-center text-center gap-2 py-1">
                 <div className="w-10 h-10 bg-tertiary/10 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">📈</span>
+                  <LuTrendingUp size={20} className="text-tertiary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-on-surface text-sm">Investir</h3>
@@ -242,7 +249,7 @@ export function Dashboard(): React.JSX.Element {
             <Card className="hover:border-primary-container transition-colors cursor-pointer h-full">
               <div className="flex flex-col items-center text-center gap-2 py-1">
                 <div className="w-10 h-10 bg-tertiary/10 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">📚</span>
+                  <LuBookOpen size={20} className="text-tertiary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-on-surface text-sm">Glossário</h3>
