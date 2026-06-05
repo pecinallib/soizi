@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AuthService } from './auth.service';
-import { registerSchema, loginSchema, refreshSchema } from './auth.schema';
+import { registerSchema, loginSchema, refreshSchema, checkEmailSchema } from './auth.schema';
 import { apiResponse } from '../../utils';
 
 const authService = new AuthService();
@@ -49,6 +49,17 @@ export class AuthController {
         description:
           'O refresh token permite renovar seu acesso sem precisar digitar email e senha novamente. Ele tem validade maior (7 dias) e é trocado a cada uso por segurança (rotação de tokens).',
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async checkEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email } = checkEmailSchema.parse(req.body);
+      const available = await authService.checkEmailAvailability(email);
+
+      apiResponse(res, 200, available ? 'Email disponível' : 'Email já cadastrado', { available });
     } catch (error) {
       next(error);
     }
