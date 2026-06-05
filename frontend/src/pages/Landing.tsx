@@ -55,7 +55,7 @@ export function Landing(): React.JSX.Element {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
               <Link
-                to="/register"
+                to="/login"
                 className="px-8 py-4 bg-primary-container text-on-primary-container font-bold text-base rounded-xl hover:brightness-110 active:brightness-95 transition-all text-center"
               >
                 Criar conta grátis
@@ -198,7 +198,7 @@ export function Landing(): React.JSX.Element {
             </div>
 
             <Link
-              to="/register"
+              to="/login"
               className="block w-full py-3.5 bg-primary-container text-on-primary-container font-bold text-base rounded-xl hover:brightness-110 active:brightness-95 transition-all text-center"
             >
               Criar conta e simular grátis
@@ -309,7 +309,7 @@ export function Landing(): React.JSX.Element {
               pra simular quantas vezes quiser.
             </p>
             <Link
-              to="/register"
+              to="/login"
               className="inline-block px-8 py-4 bg-primary-container text-on-primary-container font-bold text-base rounded-xl hover:brightness-110 transition-all"
             >
               Começar a simular
@@ -696,7 +696,7 @@ export function Landing(): React.JSX.Element {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/register"
+                to="/login"
                 className="px-10 py-4 bg-on-primary text-primary font-bold text-lg rounded-xl hover:opacity-90 transition-opacity"
               >
                 Criar conta grátis

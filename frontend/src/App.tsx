@@ -4,7 +4,6 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Login,
-  Register,
   Dashboard,
   Converter,
   Glossary,
@@ -79,14 +78,6 @@ function AppRoutes(): React.JSX.Element {
         element={
           <PublicRoute>
             <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <PublicRoute>
-            <Register />
           </PublicRoute>
         }
       />

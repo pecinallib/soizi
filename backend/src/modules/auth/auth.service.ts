@@ -129,6 +129,14 @@ export class AuthService {
     }
   }
 
+  async checkEmailAvailability(email: string): Promise<boolean> {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    return user === null;
+  }
+
   async me(userId: string): Promise<object> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
