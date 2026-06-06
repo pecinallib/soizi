@@ -11,6 +11,7 @@ import {
   SimulationDetails,
   Landing,
   Wallet,
+  Invest,
 } from '@/pages';
 import type { ReactNode } from 'react';
 
@@ -128,6 +129,14 @@ function AppRoutes(): React.JSX.Element {
         element={
           <ProtectedRoute>
             <Wallet />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/invest"
+        element={
+          <ProtectedRoute>
+            <Invest />
           </ProtectedRoute>
         }
       />

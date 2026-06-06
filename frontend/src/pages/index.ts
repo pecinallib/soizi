@@ -6,3 +6,4 @@ export { Simulator } from './Simulator';
 export { SimulationDetails } from './SimulationDetails';
 export { Landing } from './Landing';
 export { Wallet } from './Wallet';
+export { Invest } from './Invest';
