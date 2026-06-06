@@ -128,3 +128,41 @@ export interface WalletTransactionsResponse {
   limit: number;
   totalPages: number;
 }
+
+export interface StockQuote {
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  high: number;
+  low: number;
+  open: number;
+  previousClose: number;
+  timestamp: number;
+}
+
+export interface StockSearchResult {
+  symbol: string;
+  name: string;
+  type: string;
+}
+
+export interface StockTransaction {
+  id: string;
+  symbol: string;
+  type: 'BUY' | 'SELL';
+  quantity: string;
+  priceUSD: string;
+  priceBRL: string;
+  exchangeRate: string;
+  totalBRL: string;
+  createdAt: string;
+}
+
+export interface StockTransactionsResponse {
+  transactions: StockTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
