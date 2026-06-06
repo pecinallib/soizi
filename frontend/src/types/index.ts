@@ -120,3 +120,11 @@ export interface Portfolio {
   positions: PortfolioPosition[];
   totalInvestedBRL: string;
 }
+
+export interface WalletTransactionsResponse {
+  transactions: WalletTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
