@@ -20,6 +20,7 @@ import type {
   Wallet,
   WalletTransaction,
   WalletTransactionsResponse,
+  Portfolio,
 } from '@/types';
 
 type TxType =
@@ -191,6 +192,7 @@ function TransferModal({
 
 export function Wallet(): React.JSX.Element {
   const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [isLoadingWallet, setIsLoadingWallet] = useState(true);
   const [isLoadingTx, setIsLoadingTx] = useState(true);
@@ -204,8 +206,12 @@ export function Wallet(): React.JSX.Element {
     const load = async (): Promise<void> => {
       setIsLoadingWallet(true);
       try {
-        const res = await api.get<Wallet>('/wallet');
-        if (res.success && res.data) setWallet(res.data);
+        const [walletRes, portfolioRes] = await Promise.all([
+          api.get<Wallet>('/wallet'),
+          api.get<Portfolio>('/portfolio'),
+        ]);
+        if (walletRes.success && walletRes.data) setWallet(walletRes.data);
+        if (portfolioRes.success && portfolioRes.data) setPortfolio(portfolioRes.data);
       } catch {
         // silently fail
       } finally {
@@ -214,6 +220,17 @@ export function Wallet(): React.JSX.Element {
     };
     load();
   }, [walletRefresh]);
+
+  const usdHoldings = portfolio
+    ? portfolio.positions.reduce(
+        (sum, p) => sum + Number(p.quantity) * Number(p.currentPriceUSD),
+        0,
+      )
+    : 0;
+
+  const usdHoldingsBRL = portfolio
+    ? portfolio.positions.reduce((sum, p) => sum + Number(p.currentValueBRL), 0)
+    : 0;
 
   useEffect(() => {
     const load = async (): Promise<void> => {
@@ -282,40 +299,100 @@ export function Wallet(): React.JSX.Element {
           </Link>
         </div>
 
-        {/* Balance Card */}
-        <div
-          className="bg-surface border border-border rounded-2xl p-6 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-          style={{ boxShadow: 'var(--shadow-card)' }}
-        >
-          <div>
-            <p className="text-xs font-semibold text-text-muted mb-1">
-              Saldo disponível
-            </p>
-            {isLoadingWallet ? (
-              <div className="h-10 w-48 bg-border/40 rounded animate-pulse" />
-            ) : (
-              <p className="font-heading text-4xl font-bold text-on-surface tabular-nums">
-                {wallet ? formatBRL(wallet.balance) : 'R$ 0,00'}
-              </p>
-            )}
-            {wallet && !isLoadingWallet && (
-              <p className="text-xs text-text-muted mt-1">
-                Atualizado em{' '}
-                {new Date(wallet.updatedAt).toLocaleString('pt-BR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
-            )}
+        {/* Currency Holdings */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-heading text-base font-bold text-on-surface flex items-center gap-1">
+              Patrimônio por moeda
+              <ExplanationTrigger
+                explanation={{
+                  title: 'Por que ver por moeda?',
+                  description:
+                    'Quando você compra ações americanas, seu dinheiro sai em reais mas o ativo fica denominado em dólar. Isso significa que você está exposto à variação cambial — se o dólar subir, seu patrimônio em reais aumenta mesmo sem as ações se moverem.',
+                  example:
+                    'Você comprou US$2.000 em ações. Se o dólar subir de R$5 para R$6, seu patrimônio passa de R$10.000 para R$12.000 automaticamente.',
+                }}
+              />
+            </h2>
+            <Button size="sm" onClick={() => setIsTransferOpen(true)}>
+              <LuSend size={14} className="mr-1.5" />
+              Transferir
+            </Button>
           </div>
 
-          <Button onClick={() => setIsTransferOpen(true)}>
-            <LuSend size={16} className="mr-2" />
-            Transferir
-          </Button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* BRL Card */}
+            <div
+              className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2"
+              style={{ boxShadow: 'var(--shadow-card)' }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600">
+                  R$ · BRL
+                </span>
+                <span className="text-xs text-text-muted">Saldo disponível</span>
+              </div>
+              {isLoadingWallet ? (
+                <div className="h-9 w-40 bg-border/40 rounded animate-pulse" />
+              ) : (
+                <p className="font-heading text-3xl font-bold text-on-surface tabular-nums">
+                  {wallet ? formatBRL(wallet.balance) : 'R$ 0,00'}
+                </p>
+              )}
+              {wallet && !isLoadingWallet && (
+                <p className="text-xs text-text-muted">
+                  Atualizado{' '}
+                  {new Date(wallet.updatedAt).toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              )}
+            </div>
+
+            {/* USD Card — only when user has positions */}
+            {!isLoadingWallet && usdHoldings > 0 && (
+              <div
+                className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2"
+                style={{ boxShadow: 'var(--shadow-card)' }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600">
+                    $ · USD
+                  </span>
+                  <span className="text-xs text-text-muted">Em ações (EUA)</span>
+                </div>
+                <p className="font-heading text-3xl font-bold text-on-surface tabular-nums">
+                  {usdHoldings.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  })}
+                </p>
+                <p className="text-xs text-text-muted">
+                  ≈{' '}
+                  {usdHoldingsBRL.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}{' '}
+                  ao câmbio atual
+                </p>
+              </div>
+            )}
+
+            {/* Skeleton placeholder quando carregando */}
+            {isLoadingWallet && (
+              <div
+                className="bg-surface border border-border rounded-2xl p-5"
+                style={{ boxShadow: 'var(--shadow-card)' }}
+              >
+                <div className="h-5 w-20 bg-border/40 rounded animate-pulse mb-3" />
+                <div className="h-9 w-36 bg-border/40 rounded animate-pulse mb-2" />
+                <div className="h-3 w-28 bg-border/30 rounded animate-pulse" />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Transactions */}
