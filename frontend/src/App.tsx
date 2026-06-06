@@ -10,6 +10,7 @@ import {
   Simulator,
   SimulationDetails,
   Landing,
+  Wallet,
 } from '@/pages';
 import type { ReactNode } from 'react';
 
@@ -119,6 +120,14 @@ function AppRoutes(): React.JSX.Element {
         element={
           <ProtectedRoute>
             <SimulationDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wallet"
+        element={
+          <ProtectedRoute>
+            <Wallet />
           </ProtectedRoute>
         }
       />
