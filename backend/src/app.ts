@@ -9,6 +9,7 @@ import { explanationRoutes } from './modules/explanation';
 import { walletRoutes } from './modules/wallet';
 import { stockRoutes } from './modules/stock';
 import { portfolioRoutes } from './modules/portfolio';
+import { forexRoutes } from './modules/forex';
 import { errorHandler } from './middlewares';
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/api/explanation', explanationRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/forex', forexRoutes);
 
 app.use(errorHandler);
 
