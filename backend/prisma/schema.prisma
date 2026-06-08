@@ -9,16 +9,20 @@ datasource db {
 // ─── Usuário ────────────────────────────────────────────────────────────────
 
 model User {
-  id                String             @id @default(uuid())
-  name              String
-  email             String             @unique
-  password          String
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @updatedAt @map("updated_at")
-  remittances       Remittance[]
-  wallet            Wallet?
-  stockTransactions StockTransaction[]
-  portfolios        Portfolio[]
+  id                   String                @id @default(uuid())
+  name                 String
+  email                String                @unique
+  password             String
+  accountNumber        String?               @unique @map("account_number")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  wallet               Wallet?
+  stockTransactions    StockTransaction[]
+  portfolios           Portfolio[]
+  currencyHoldings     CurrencyHolding[]
+  currencyTransactions CurrencyTransaction[]
+  sentRemittances      Remittance[]          @relation("SentRemittances")
+  receivedRemittances  Remittance[]          @relation("ReceivedRemittances")
 
   @@map("users")
 }
@@ -92,24 +96,66 @@ model StockTransaction {
 // ─── Remessa ─────────────────────────────────────────────────────────────────
 
 model Remittance {
-  id             String           @id @default(uuid())
-  userId         String           @map("user_id")
-  originCurrency String           @map("origin_currency")
-  targetCurrency String           @map("target_currency")
-  originAmount   Decimal          @map("origin_amount") @db.Decimal(15, 2)
-  targetAmount   Decimal          @map("target_amount") @db.Decimal(15, 2)
-  exchangeRate   Decimal          @map("exchange_rate") @db.Decimal(15, 6)
-  fee            Decimal          @db.Decimal(15, 2)
-  spread         Decimal          @db.Decimal(5, 4)
-  totalCost      Decimal          @map("total_cost") @db.Decimal(15, 2)
-  status         RemittanceStatus @default(PENDING)
-  createdAt      DateTime         @default(now()) @map("created_at")
-  updatedAt      DateTime         @updatedAt @map("updated_at")
-  user           User             @relation(fields: [userId], references: [id])
+  id              String           @id @default(uuid())
+  userId          String           @map("user_id")
+  recipientId     String?          @map("recipient_id")
+  originCurrency  String           @map("origin_currency")
+  targetCurrency  String           @map("target_currency")
+  originAmount    Decimal          @map("origin_amount") @db.Decimal(15, 2)
+  targetAmount    Decimal          @map("target_amount") @db.Decimal(15, 2)
+  exchangeRate    Decimal          @map("exchange_rate") @db.Decimal(15, 6)
+  fee             Decimal          @default(0) @db.Decimal(15, 2)
+  iof             Decimal          @default(0) @db.Decimal(15, 2)
+  spread          Decimal          @default(0) @db.Decimal(5, 4)
+  spreadAmount    Decimal          @default(0) @map("spread_amount") @db.Decimal(15, 2)
+  totalCost       Decimal          @map("total_cost") @db.Decimal(15, 2)
+  recipientAmount Decimal          @default(0) @map("recipient_amount") @db.Decimal(15, 2)
+  status          RemittanceStatus @default(COMPLETED)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  user            User             @relation("SentRemittances", fields: [userId], references: [id])
+  recipient       User?            @relation("ReceivedRemittances", fields: [recipientId], references: [id])
 
   @@index([userId])
+  @@index([recipientId])
   @@index([status])
   @@map("remittances")
+}
+
+// ─── Câmbio (Forex) ──────────────────────────────────────────────────────────
+
+model CurrencyHolding {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  currency      String
+  amount        Decimal  @db.Decimal(20, 8)
+  avgBuyRateBRL Decimal  @map("avg_buy_rate_brl") @db.Decimal(18, 4)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, currency])
+  @@index([userId])
+  @@map("currency_holdings")
+}
+
+model CurrencyTransaction {
+  id        String                  @id @default(uuid())
+  userId    String                  @map("user_id")
+  type      CurrencyTransactionType
+  currency  String
+  amount    Decimal                 @db.Decimal(20, 8)
+  rateBRL   Decimal                 @map("rate_brl") @db.Decimal(18, 4)
+  grossBRL  Decimal                 @map("gross_brl") @db.Decimal(18, 2)
+  iofBRL    Decimal                 @map("iof_brl") @db.Decimal(18, 2)
+  feeBRL    Decimal                 @map("fee_brl") @db.Decimal(18, 2)
+  spreadBRL Decimal                 @map("spread_brl") @db.Decimal(18, 2)
+  netBRL    Decimal                 @map("net_brl") @db.Decimal(18, 2)
+  createdAt DateTime                @default(now()) @map("created_at")
+  user      User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("currency_transactions")
 }
 
 // ─── Conteúdo educativo ──────────────────────────────────────────────────────
@@ -140,9 +186,18 @@ enum WalletTransactionType {
   STOCK_BUY
   STOCK_SELL
   REMITTANCE
+  FOREX_BUY
+  FOREX_SELL
+  REMITTANCE_SENT
+  REMITTANCE_RECEIVED
 }
 
 enum StockTransactionType {
+  BUY
+  SELL
+}
+
+enum CurrencyTransactionType {
   BUY
   SELL
 }
