@@ -2,6 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  accountNumber: string | null;
   createdAt: string;
 }
 
@@ -165,4 +166,66 @@ export interface StockTransactionsResponse {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+export interface CurrencyHolding {
+  currency: string;
+  amount: string;
+  avgBuyRateBRL: string;
+  currentRateBRL: string | null;
+  currentValueBRL: string | null;
+  pnlBRL: string | null;
+  pnlPercent: string | null;
+}
+
+export interface CurrencyTransaction {
+  id: string;
+  type: 'BUY' | 'SELL';
+  currency: string;
+  amount: string;
+  rateBRL: string;
+  grossBRL: string;
+  iofBRL: string;
+  feeBRL: string;
+  spreadBRL: string;
+  netBRL: string;
+  createdAt: string;
+}
+
+export interface CurrencyTransactionsResponse {
+  transactions: CurrencyTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface ForexResult {
+  currency: string;
+  amount: string;
+  rateBRL: string;
+  grossBRL: string;
+  iofBRL: string;
+  feeBRL: string;
+  spreadBRL: string;
+  netBRL: string;
+  newBalance: string;
+  holding: { currency: string; amount: string; avgBuyRateBRL: string };
+}
+
+export interface P2PRemittanceResult {
+  id: string;
+  originCurrency: string;
+  targetCurrency: string;
+  originAmount: string;
+  targetAmount: string;
+  exchangeRate: string;
+  fee: string;
+  iof: string;
+  spread: string;
+  spreadAmount: string;
+  totalCost: string;
+  recipientAmount: string;
+  status: string;
+  createdAt: string;
 }
