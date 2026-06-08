@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import {
   LuWallet,
   LuArrowDownLeft,
@@ -12,6 +13,8 @@ import {
   LuChevronLeft,
   LuChevronRight,
   LuX,
+  LuCopy,
+  LuCheck,
 } from 'react-icons/lu';
 import { api } from '@/services/api';
 import { Card, Button, Input, ExplanationTrigger } from '@/components/ui';
@@ -52,9 +55,13 @@ const TX_META: Record<
   INITIAL_CREDIT: { label: 'Crédito inicial', positive: true, Icon: LuGift },
   TRANSFER_IN: { label: 'Recebido', positive: true, Icon: LuArrowDownLeft },
   TRANSFER_OUT: { label: 'Transferido', positive: false, Icon: LuArrowUpRight },
-  REMITTANCE_DEBIT: { label: 'Remessa', positive: false, Icon: LuGlobe },
+  REMITTANCE_DEBIT: { label: 'Remessa enviada', positive: false, Icon: LuGlobe },
+  REMITTANCE_SENT: { label: 'Remessa enviada', positive: false, Icon: LuGlobe },
+  REMITTANCE_RECEIVED: { label: 'Remessa recebida', positive: true, Icon: LuGlobe },
   STOCK_BUY: { label: 'Compra de ação', positive: false, Icon: LuTrendingUp },
   STOCK_SELL: { label: 'Venda de ação', positive: true, Icon: LuTrendingDown },
+  FOREX_BUY: { label: 'Compra de moeda', positive: false, Icon: LuTrendingUp },
+  FOREX_SELL: { label: 'Venda de moeda', positive: true, Icon: LuTrendingDown },
 };
 
 function formatBRL(value: string | number): string {
@@ -191,6 +198,8 @@ function TransferModal({
 }
 
 export function Wallet(): React.JSX.Element {
+  const { user } = useAuth();
+  const [copied, setCopied] = useState(false);
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
@@ -298,6 +307,30 @@ export function Wallet(): React.JSX.Element {
             ← Voltar ao Dashboard
           </Link>
         </div>
+
+        {/* Account Number */}
+        {user?.accountNumber && (
+          <div className="mb-6 flex items-center gap-4 bg-surface border border-border rounded-2xl px-5 py-4" style={{ boxShadow: 'var(--shadow-card)' }}>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-text-muted mb-0.5">Seu número de conta SoIzi</p>
+              <p className="font-heading font-bold text-on-surface tracking-widest text-lg tabular-nums">
+                {user.accountNumber}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard.writeText(user.accountNumber!);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-border text-text-muted hover:text-on-surface hover:border-primary hover:bg-primary/5 transition-all cursor-pointer shrink-0"
+            >
+              {copied ? <LuCheck size={14} className="text-emerald-500" /> : <LuCopy size={14} />}
+              {copied ? 'Copiado!' : 'Copiar'}
+            </button>
+          </div>
+        )}
 
         {/* Currency Holdings */}
         <div className="mb-8">
