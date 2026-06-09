@@ -5,7 +5,7 @@ export function Footer(): React.JSX.Element {
     <footer className="border-t border-border mt-auto">
       <div className="max-w-300 mx-auto px-5 md:px-10 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          <span className="font-heading font-bold text-primary">SoIzi</span>
+          <img src="/logo.png" alt="SoIzi" className="h-7 w-auto" />
           <p className="text-sm text-text-muted mt-1">
             Simulador educativo de transferências internacionais.
           </p>

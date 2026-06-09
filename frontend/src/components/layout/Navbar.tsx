@@ -15,8 +15,8 @@ export function Navbar(): React.JSX.Element {
     <header className="sticky top-0 z-30 bg-surface/80 backdrop-blur-md border-b border-border">
       <nav className="max-w-300 mx-auto px-5 md:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/" className="font-heading text-xl font-bold text-primary">
-            SoIzi
+          <Link to="/">
+            <img src="/logo.png" alt="SoIzi" className="h-8 w-auto" />
           </Link>
 
           {isAuthenticated && (
