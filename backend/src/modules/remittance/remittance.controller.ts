@@ -4,6 +4,7 @@ import {
   createRemittanceSchema,
   remittanceIdSchema,
   listRemittancesSchema,
+  sendP2PSchema,
 } from './remittance.schema';
 import { apiResponse } from '../../utils';
 
@@ -54,6 +55,23 @@ export class RemittanceController {
         title: 'Como ler os detalhes da remessa?',
         description:
           'originAmount: valor que você enviou na moeda de origem. targetAmount: valor que chega na moeda de destino. exchangeRate: taxa de câmbio usada. spread: percentual cobrado pela operação (diferença entre taxa real e taxa aplicada). fee: taxa fixa operacional. totalCost: custo total na moeda de origem (valor enviado + taxa fixa).',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async sendP2P(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.userId as string;
+      const data = sendP2PSchema.parse(req.body);
+      const result = await remittanceService.sendP2P(userId, data);
+      apiResponse(res, 200, 'Remessa enviada com sucesso', result, {
+        title: 'Quais taxas são cobradas numa remessa?',
+        description:
+          'IOF (0,38%): imposto federal obrigatório. Spread (1,5%): margem da instituição financeira — é o que o banco "fica" da operação, reduzindo o valor que o destinatário recebe. Taxa fixa (R$5,00): custo operacional da transferência.',
+        example:
+          'Enviando R$2.000: IOF = R$7,60 | Taxa = R$5,00 | Spread = R$30,00. Você paga R$2.012,60. Destinatário recebe R$1.970,00.',
       });
     } catch (error) {
       next(error);

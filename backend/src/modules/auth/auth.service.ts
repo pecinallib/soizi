@@ -20,6 +20,13 @@ interface UserPayload {
 }
 
 export class AuthService {
+  private generateAccountNumber(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const part = (len: number) =>
+      Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    return `SOIZI-${part(4)}-${part(4)}`;
+  }
+
   private generateTokens(payload: UserPayload): TokenPair {
     const accessToken = jwt.sign(payload, env.JWT_SECRET, {
       expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
@@ -45,16 +52,24 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
+    // Gera número de conta único com retry em caso de colisão
+    let accountNumber: string;
+    do {
+      accountNumber = this.generateAccountNumber();
+    } while (await prisma.user.findUnique({ where: { accountNumber } }));
+
     const user = await prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
         password: hashedPassword,
+        accountNumber,
       },
       select: {
         id: true,
         name: true,
         email: true,
+        accountNumber: true,
         createdAt: true,
       },
     });
@@ -144,6 +159,7 @@ export class AuthService {
         id: true,
         name: true,
         email: true,
+        accountNumber: true,
         createdAt: true,
       },
     });
