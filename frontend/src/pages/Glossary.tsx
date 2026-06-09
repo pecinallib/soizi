@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { IoArrowForwardCircleOutline } from 'react-icons/io5';
 import { api } from '@/services/api';
 import { Navbar } from '@/components/layout';
 import { Footer } from '@/components/layout';
@@ -196,7 +197,7 @@ export function Glossary(): React.JSX.Element {
                     {/* Example or Action */}
                     {item.example && (
                       <p className="text-sm text-primary font-semibold group-hover:underline cursor-pointer">
-                        O que é isso na prática? →
+                        O que é isso na prática? <IoArrowForwardCircleOutline className="inline ml-1" size={16} />
                       </p>
                     )}
                   </div>

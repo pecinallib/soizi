@@ -7,6 +7,7 @@ import {
   LuTrendingUp,
   LuBookOpen,
 } from 'react-icons/lu';
+import { IoArrowForwardCircleOutline } from 'react-icons/io5';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/services/api';
 import { Card, Button, ExplanationTrigger } from '@/components/ui';
@@ -278,7 +279,7 @@ export function Dashboard(): React.JSX.Element {
                 />
               </h2>
               <Link to="/invest" className="text-xs text-primary font-semibold hover:underline">
-                Ver tudo →
+                Ver tudo <IoArrowForwardCircleOutline className="inline ml-1" size={14} />
               </Link>
             </div>
 
@@ -350,7 +351,7 @@ export function Dashboard(): React.JSX.Element {
                   />
                 </h2>
                 <Link to="/simulator" className="text-xs text-primary font-semibold hover:underline">
-                  Nova simulação →
+                  Nova simulação <IoArrowForwardCircleOutline className="inline ml-1" size={14} />
                 </Link>
               </div>
 

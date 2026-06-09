@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect, useRef } from 'react';
+import { IoArrowForwardCircleOutline } from 'react-icons/io5';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Globe } from '@/components/ui/Globe';
@@ -256,7 +257,7 @@ export function Login(): React.JSX.Element {
                   {card.description}
                 </p>
                 <span className="text-xs text-primary font-semibold">
-                  {card.linkText} →
+                  {card.linkText} <IoArrowForwardCircleOutline className="inline ml-1" size={14} />
                 </span>
               </div>
             ))}

@@ -10,6 +10,7 @@ import {
   LuRefreshCw,
   LuWallet,
 } from 'react-icons/lu';
+import { IoArrowForwardCircleOutline } from 'react-icons/io5';
 import {
   AreaChart,
   Area,
@@ -695,7 +696,7 @@ export function Converter(): React.JSX.Element {
                   Sabia que enviar valores maiores pode reduzir o custo proporcional da sua remessa?
                 </p>
                 <Link to="/simulator" className="mt-3 inline-block text-sm font-semibold underline underline-offset-2 hover:opacity-80 transition-opacity">
-                  Ver simulação por volume →
+                  Ver simulação por volume <IoArrowForwardCircleOutline className="inline ml-1" size={15} />
                 </Link>
               </div>
             </div>
@@ -733,7 +734,7 @@ export function Converter(): React.JSX.Element {
               <p className="text-sm font-semibold text-on-surface mb-1">Pronto para entender suas remessas globais?</p>
               <p className="text-xs text-text-muted mb-4">Explore todos os termos financeiros no glossário.</p>
               <Link to="/glossary" className="inline-block px-6 py-2.5 border-2 border-primary text-primary font-semibold text-sm rounded-xl hover:bg-primary/5 transition-colors">
-                Explorar Glossário →
+                Explorar Glossário <IoArrowForwardCircleOutline className="inline ml-1" size={16} />
               </Link>
             </div>
           </div>
