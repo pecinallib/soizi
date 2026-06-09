@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { IoArrowForwardCircleOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { ExplanationTrigger } from '@/components/ui';
@@ -431,9 +432,7 @@ export function Simulator(): React.JSX.Element {
                             {formatCurrency(amount, fromCurrency)}
                           </p>
                         </div>
-                        <span className="text-2xl text-primary-container">
-                          →
-                        </span>
+                        <IoArrowForwardCircleOutline size={28} className="text-primary-container shrink-0" />
                         <div className="text-center">
                           <p className="text-xs text-text-muted">
                             Destinatário recebe
@@ -597,7 +596,7 @@ export function Simulator(): React.JSX.Element {
                           )}
                         </p>
                       </div>
-                      <span className="text-xl text-primary-container">→</span>
+                      <IoArrowForwardCircleOutline size={22} className="text-primary-container shrink-0" />
                       <div className="text-right">
                         <p className="text-xs text-text-muted">
                           Destinatário recebe

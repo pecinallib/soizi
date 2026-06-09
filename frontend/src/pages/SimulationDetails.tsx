@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { IoArrowForwardCircleOutline } from 'react-icons/io5';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '@/services/api';
 import { ExplanationTrigger } from '@/components/ui';
@@ -289,7 +290,7 @@ export function SimulationDetails(): React.JSX.Element {
                   </p>
                 </div>
 
-                <span className="text-3xl text-primary-container">→</span>
+                <IoArrowForwardCircleOutline size={32} className="text-primary-container shrink-0" />
 
                 <div className="text-center sm:text-right">
                   <p className="text-xs text-text-muted uppercase tracking-wider">
