@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   IoArrowForwardCircleOutline,
   IoCheckmarkOutline,
@@ -11,6 +11,7 @@ import {
   IoWalletOutline,
   IoPaperPlaneOutline,
   IoTimeOutline,
+  IoChevronDownOutline,
 } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
@@ -27,6 +28,14 @@ const CURRENCY_FLAGS: Record<string, string> = {
   EUR: '/lp/flags/eur.png',
   GBP: '/lp/flags/gbp.png',
 };
+
+const COUNTRIES = [
+  { label: 'Estados Unidos', flag: '/lp/flags/eua.png' },
+  { label: 'Portugal',       flag: '/lp/flags/eur.png' },
+  { label: 'Reino Unido',    flag: '/lp/flags/gbp.png' },
+  { label: 'Alemanha',       flag: '/lp/flags/eur.png' },
+  { label: 'Japão',          flag: '/lp/flags/jpy.png' },
+];
 
 interface RecipientData {
   name: string;
@@ -57,6 +66,20 @@ export function Simulator(): React.JSX.Element {
 
   // Step 4 - Resultado
   const [remittance, setRemittance] = useState<Remittance | null>(null);
+
+  // Step 2 - País de destino dropdown
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const countryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent): void => {
+      if (countryRef.current && !countryRef.current.contains(e.target as Node)) {
+        setIsCountryOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const value = parseFloat(amount);
@@ -331,22 +354,71 @@ export function Simulator(): React.JSX.Element {
                       <label className="text-sm font-semibold text-on-surface">
                         País de destino
                       </label>
-                      <select
-                        value={recipient.country}
-                        onChange={(e) =>
-                          setRecipient({
-                            ...recipient,
-                            country: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-surface border border-border rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container transition-all cursor-pointer"
-                      >
-                        <option value="Estados Unidos">Estados Unidos</option>
-                        <option value="Portugal">Portugal</option>
-                        <option value="Reino Unido">Reino Unido</option>
-                        <option value="Alemanha">Alemanha</option>
-                        <option value="Japão">Japão</option>
-                      </select>
+                      <div ref={countryRef} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setIsCountryOpen((v) => !v)}
+                          className={`w-full px-4 py-3 bg-surface border rounded-lg text-on-surface flex items-center justify-between gap-3 cursor-pointer transition-all ${
+                            isCountryOpen
+                              ? 'border-primary-container ring-2 ring-primary-container'
+                              : 'border-border hover:border-primary-container/50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <img
+                              src={COUNTRIES.find((c) => c.label === recipient.country)?.flag}
+                              alt={recipient.country}
+                              className="w-7 h-5 rounded object-cover shrink-0"
+                            />
+                            <span className="text-sm font-medium text-on-surface">
+                              {recipient.country}
+                            </span>
+                          </div>
+                          <IoChevronDownOutline
+                            size={16}
+                            className={`text-text-muted transition-transform duration-200 ${
+                              isCountryOpen ? 'rotate-180' : 'rotate-0'
+                            }`}
+                          />
+                        </button>
+
+                        <div
+                          className={`absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg z-50 overflow-hidden transition-all duration-200 origin-top ${
+                            isCountryOpen
+                              ? 'opacity-100 scale-y-100 translate-y-0'
+                              : 'opacity-0 scale-y-95 -translate-y-1 pointer-events-none'
+                          }`}
+                          style={{ boxShadow: 'var(--shadow-card)' }}
+                        >
+                          {COUNTRIES.map((country) => (
+                            <button
+                              key={country.label}
+                              type="button"
+                              onClick={() => {
+                                setRecipient({ ...recipient, country: country.label });
+                                setIsCountryOpen(false);
+                              }}
+                              className={`w-full px-4 py-3 flex items-center gap-2.5 transition-colors text-left ${
+                                recipient.country === country.label
+                                  ? 'bg-primary-container/10 text-primary'
+                                  : 'text-on-surface hover:bg-surface-container'
+                              }`}
+                            >
+                              <img
+                                src={country.flag}
+                                alt={country.label}
+                                className="w-7 h-5 rounded object-cover shrink-0"
+                              />
+                              <span className="text-sm font-medium flex-1">
+                                {country.label}
+                              </span>
+                              {recipient.country === country.label && (
+                                <IoCheckmarkOutline size={14} className="text-primary shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
