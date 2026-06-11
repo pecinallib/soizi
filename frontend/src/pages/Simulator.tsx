@@ -1,5 +1,18 @@
-import { useState } from 'react';
-import { IoArrowForwardCircleOutline } from 'react-icons/io5';
+import { useState, useEffect, useRef } from 'react';
+import {
+  IoArrowForwardCircleOutline,
+  IoCheckmarkOutline,
+  IoInformationCircleOutline,
+  IoSchoolOutline,
+  IoBulbOutline,
+  IoTrophyOutline,
+  IoSwapVerticalOutline,
+  IoChevronBackOutline,
+  IoWalletOutline,
+  IoPaperPlaneOutline,
+  IoTimeOutline,
+  IoChevronDownOutline,
+} from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { ExplanationTrigger } from '@/components/ui';
@@ -8,6 +21,21 @@ import { Footer } from '@/components/layout';
 import type { ConversionResult, Remittance } from '@/types';
 
 const STEPS = ['Valor', 'Destinatário', 'Revisão', 'Resultado'];
+
+const CURRENCY_FLAGS: Record<string, string> = {
+  BRL: '/lp/flags/brl.png',
+  USD: '/lp/flags/eua.png',
+  EUR: '/lp/flags/eur.png',
+  GBP: '/lp/flags/gbp.png',
+};
+
+const COUNTRIES = [
+  { label: 'Estados Unidos', flag: '/lp/flags/eua.png' },
+  { label: 'Portugal',       flag: '/lp/flags/eur.png' },
+  { label: 'Reino Unido',    flag: '/lp/flags/gbp.png' },
+  { label: 'Alemanha',       flag: '/lp/flags/eur.png' },
+  { label: 'Japão',          flag: '/lp/flags/jpy.png' },
+];
 
 interface RecipientData {
   name: string;
@@ -39,6 +67,41 @@ export function Simulator(): React.JSX.Element {
   // Step 4 - Resultado
   const [remittance, setRemittance] = useState<Remittance | null>(null);
 
+  // Step 2 - País de destino dropdown
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const countryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent): void => {
+      if (countryRef.current && !countryRef.current.contains(e.target as Node)) {
+        setIsCountryOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const value = parseFloat(amount);
+    if (isNaN(value) || value <= 0) return;
+    const timer = setTimeout(async () => {
+      setConvertLoading(true);
+      try {
+        const response = await api.post<ConversionResult>('/exchange/convert', {
+          from: fromCurrency,
+          to: toCurrency,
+          amount: value,
+        });
+        if (response.success && response.data) setConversion(response.data);
+      } catch {
+        // silently fail
+      } finally {
+        setConvertLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [amount, fromCurrency, toCurrency]);
+
   const handleConvert = async (): Promise<void> => {
     const value = parseFloat(amount);
     if (isNaN(value) || value <= 0) return;
@@ -62,7 +125,7 @@ export function Simulator(): React.JSX.Element {
   };
 
   const handleNextFromStep1 = async (): Promise<void> => {
-    await handleConvert();
+    if (!conversion) await handleConvert();
     setCurrentStep(1);
   };
 
@@ -108,7 +171,7 @@ export function Simulator(): React.JSX.Element {
                         : 'bg-surface-container text-text-muted border border-border'
                   }`}
                 >
-                  {index < currentStep ? '✓' : index + 1}
+                  {index < currentStep ? <IoCheckmarkOutline size={16} /> : index + 1}
                 </div>
                 <span
                   className={`text-xs mt-2 font-semibold ${
@@ -146,10 +209,11 @@ export function Simulator(): React.JSX.Element {
                     Defina o valor e as moedas da sua simulação.
                   </p>
 
-                  <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-4">
                     {/* From */}
                     <div>
-                      <label className="text-sm text-text-muted mb-1.5 block">
+                      <label className="text-sm text-text-muted mb-1.5 flex items-center gap-1.5">
+                        <IoWalletOutline size={14} />
                         Você envia
                       </label>
                       <div className="flex items-center gap-3 border border-border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-primary-container transition-all">
@@ -160,9 +224,11 @@ export function Simulator(): React.JSX.Element {
                           className="flex-1 text-xl font-semibold text-on-surface bg-transparent focus:outline-none tabular-nums"
                         />
                         <div className="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-1.5">
-                          <span className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-on-primary text-xs font-bold">
-                            {fromCurrency.charAt(0)}
-                          </span>
+                          <img
+                            src={CURRENCY_FLAGS[fromCurrency]}
+                            alt={fromCurrency}
+                            className="w-7 h-5 rounded object-cover shrink-0"
+                          />
                           <select
                             value={fromCurrency}
                             onChange={(e) => setFromCurrency(e.target.value)}
@@ -177,9 +243,26 @@ export function Simulator(): React.JSX.Element {
                       </div>
                     </div>
 
+                    {/* Swap */}
+                    <div className="flex justify-center -my-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const temp = fromCurrency;
+                          setFromCurrency(toCurrency);
+                          setToCurrency(temp);
+                        }}
+                        className="w-9 h-9 rounded-full bg-surface-container border border-border flex items-center justify-center hover:bg-surface-container-high transition-colors cursor-pointer"
+                        title="Inverter moedas"
+                      >
+                        <IoSwapVerticalOutline size={18} className="text-text-muted" />
+                      </button>
+                    </div>
+
                     {/* To */}
                     <div>
-                      <label className="text-sm text-text-muted mb-1.5 block">
+                      <label className="text-sm text-text-muted mb-1.5 flex items-center gap-1.5">
+                        <IoPaperPlaneOutline size={14} />
                         O destinatário recebe
                       </label>
                       <div className="flex items-center gap-3 border border-border rounded-xl px-4 py-3 bg-surface-container-low">
@@ -196,9 +279,11 @@ export function Simulator(): React.JSX.Element {
                           className="flex-1 text-xl font-semibold text-on-surface bg-transparent focus:outline-none tabular-nums"
                         />
                         <div className="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-1.5">
-                          <span className="w-6 h-6 bg-secondary rounded-full flex items-center justify-center text-on-secondary text-xs font-bold">
-                            {toCurrency.charAt(0)}
-                          </span>
+                          <img
+                            src={CURRENCY_FLAGS[toCurrency]}
+                            alt={toCurrency}
+                            className="w-7 h-5 rounded object-cover shrink-0"
+                          />
                           <select
                             value={toCurrency}
                             onChange={(e) => setToCurrency(e.target.value)}
@@ -215,7 +300,7 @@ export function Simulator(): React.JSX.Element {
 
                     {/* Info */}
                     <div className="bg-surface-container rounded-xl p-4 flex items-start gap-3 border border-border">
-                      <span className="text-tertiary text-lg">ℹ️</span>
+                      <IoInformationCircleOutline size={20} className="text-tertiary shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-semibold text-on-surface">
                           Câmbio simulado em tempo real
@@ -269,22 +354,71 @@ export function Simulator(): React.JSX.Element {
                       <label className="text-sm font-semibold text-on-surface">
                         País de destino
                       </label>
-                      <select
-                        value={recipient.country}
-                        onChange={(e) =>
-                          setRecipient({
-                            ...recipient,
-                            country: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-surface border border-border rounded-lg text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container transition-all cursor-pointer"
-                      >
-                        <option value="Estados Unidos">Estados Unidos</option>
-                        <option value="Portugal">Portugal</option>
-                        <option value="Reino Unido">Reino Unido</option>
-                        <option value="Alemanha">Alemanha</option>
-                        <option value="Japão">Japão</option>
-                      </select>
+                      <div ref={countryRef} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setIsCountryOpen((v) => !v)}
+                          className={`w-full px-4 py-3 bg-surface border rounded-lg text-on-surface flex items-center justify-between gap-3 cursor-pointer transition-all ${
+                            isCountryOpen
+                              ? 'border-primary-container ring-2 ring-primary-container'
+                              : 'border-border hover:border-primary-container/50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <img
+                              src={COUNTRIES.find((c) => c.label === recipient.country)?.flag}
+                              alt={recipient.country}
+                              className="w-7 h-5 rounded object-cover shrink-0"
+                            />
+                            <span className="text-sm font-medium text-on-surface">
+                              {recipient.country}
+                            </span>
+                          </div>
+                          <IoChevronDownOutline
+                            size={16}
+                            className={`text-text-muted transition-transform duration-200 ${
+                              isCountryOpen ? 'rotate-180' : 'rotate-0'
+                            }`}
+                          />
+                        </button>
+
+                        <div
+                          className={`absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg z-50 overflow-hidden transition-all duration-200 origin-top ${
+                            isCountryOpen
+                              ? 'opacity-100 scale-y-100 translate-y-0'
+                              : 'opacity-0 scale-y-95 -translate-y-1 pointer-events-none'
+                          }`}
+                          style={{ boxShadow: 'var(--shadow-card)' }}
+                        >
+                          {COUNTRIES.map((country) => (
+                            <button
+                              key={country.label}
+                              type="button"
+                              onClick={() => {
+                                setRecipient({ ...recipient, country: country.label });
+                                setIsCountryOpen(false);
+                              }}
+                              className={`w-full px-4 py-3 flex items-center gap-2.5 transition-colors text-left ${
+                                recipient.country === country.label
+                                  ? 'bg-primary-container/10 text-primary'
+                                  : 'text-on-surface hover:bg-surface-container'
+                              }`}
+                            >
+                              <img
+                                src={country.flag}
+                                alt={country.label}
+                                className="w-7 h-5 rounded object-cover shrink-0"
+                              />
+                              <span className="text-sm font-medium flex-1">
+                                {country.label}
+                              </span>
+                              {recipient.country === country.label && (
+                                <IoCheckmarkOutline size={14} className="text-primary shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -342,7 +476,8 @@ export function Simulator(): React.JSX.Element {
                     {/* Simulation Notice */}
                     <div className="bg-primary-container/10 rounded-xl p-4 border border-primary-container/30">
                       <p className="text-sm text-primary font-semibold flex items-center gap-2">
-                        🎓 Simulação Educativa
+                        <IoSchoolOutline size={16} />
+                        Simulação Educativa
                       </p>
                       <p className="text-xs text-text-muted mt-1">
                         Nenhum dado real é processado. Preencha com dados
@@ -355,8 +490,9 @@ export function Simulator(): React.JSX.Element {
                       <button
                         type="button"
                         onClick={() => setCurrentStep(0)}
-                        className="flex-1 py-3.5 border-2 border-border text-on-surface font-bold text-base rounded-xl hover:bg-surface-container transition-all cursor-pointer"
+                        className="flex-1 py-3.5 border-2 border-border text-on-surface font-bold text-base rounded-xl hover:bg-surface-container transition-all cursor-pointer flex items-center justify-center gap-2"
                       >
+                        <IoChevronBackOutline size={18} />
                         Voltar
                       </button>
                       <button
@@ -499,8 +635,9 @@ export function Simulator(): React.JSX.Element {
                       <button
                         type="button"
                         onClick={() => setCurrentStep(1)}
-                        className="flex-1 py-3.5 border-2 border-border text-on-surface font-bold text-base rounded-xl hover:bg-surface-container transition-all cursor-pointer"
+                        className="flex-1 py-3.5 border-2 border-border text-on-surface font-bold text-base rounded-xl hover:bg-surface-container transition-all cursor-pointer flex items-center justify-center gap-2"
                       >
+                        <IoChevronBackOutline size={18} />
                         Voltar
                       </button>
                       <button
@@ -521,7 +658,7 @@ export function Simulator(): React.JSX.Element {
                 <div>
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-primary-container/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-3xl">🎉</span>
+                      <IoTrophyOutline size={36} className="text-primary-container" />
                     </div>
                     <h2 className="font-heading text-2xl font-bold text-secondary">
                       Simulação concluída!
@@ -535,7 +672,8 @@ export function Simulator(): React.JSX.Element {
                   {/* Status Tracker */}
                   <div className="bg-surface-container rounded-xl p-6 mb-6">
                     <h3 className="font-heading font-bold text-on-surface mb-4 flex items-center gap-2">
-                      📍 Status da Transferência
+                      <IoTimeOutline size={18} className="text-primary-container" />
+                      Status da Transferência
                       <ExplanationTrigger
                         explanation={{
                           title: 'O que acontece em cada etapa?',
@@ -559,7 +697,7 @@ export function Simulator(): React.JSX.Element {
                                     : 'bg-surface border border-border text-text-muted'
                                 }`}
                               >
-                                {index === 0 ? '✓' : index + 1}
+                                {index === 0 ? <IoCheckmarkOutline size={14} /> : index + 1}
                               </div>
                               <span className="text-xs mt-1 text-text-muted">
                                 {status}
@@ -652,7 +790,8 @@ export function Simulator(): React.JSX.Element {
                   {/* Você sabia? */}
                   <div className="bg-tertiary/5 border border-tertiary/20 rounded-xl p-5 mb-6">
                     <p className="text-sm font-semibold text-tertiary flex items-center gap-2 mb-2">
-                      💡 Você sabia?
+                      <IoBulbOutline size={16} />
+                      Você sabia?
                     </p>
                     <p className="text-sm text-text-muted leading-relaxed">
                       Uma transferência internacional real leva em média 1-3
