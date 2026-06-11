@@ -9,6 +9,13 @@ import type { ConversionResult, Remittance } from '@/types';
 
 const STEPS = ['Valor', 'Destinatário', 'Revisão', 'Resultado'];
 
+const CURRENCY_FLAGS: Record<string, string> = {
+  BRL: '/lp/flags/brl.png',
+  USD: '/lp/flags/eua.png',
+  EUR: '/lp/flags/eur.png',
+  GBP: '/lp/flags/gbp.png',
+};
+
 interface RecipientData {
   name: string;
   country: string;
@@ -160,9 +167,11 @@ export function Simulator(): React.JSX.Element {
                           className="flex-1 text-xl font-semibold text-on-surface bg-transparent focus:outline-none tabular-nums"
                         />
                         <div className="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-1.5">
-                          <span className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-on-primary text-xs font-bold">
-                            {fromCurrency.charAt(0)}
-                          </span>
+                          <img
+                            src={CURRENCY_FLAGS[fromCurrency]}
+                            alt={fromCurrency}
+                            className="w-7 h-5 rounded object-cover shrink-0"
+                          />
                           <select
                             value={fromCurrency}
                             onChange={(e) => setFromCurrency(e.target.value)}
@@ -196,9 +205,11 @@ export function Simulator(): React.JSX.Element {
                           className="flex-1 text-xl font-semibold text-on-surface bg-transparent focus:outline-none tabular-nums"
                         />
                         <div className="flex items-center gap-2 bg-surface-container rounded-lg px-3 py-1.5">
-                          <span className="w-6 h-6 bg-secondary rounded-full flex items-center justify-center text-on-secondary text-xs font-bold">
-                            {toCurrency.charAt(0)}
-                          </span>
+                          <img
+                            src={CURRENCY_FLAGS[toCurrency]}
+                            alt={toCurrency}
+                            className="w-7 h-5 rounded object-cover shrink-0"
+                          />
                           <select
                             value={toCurrency}
                             onChange={(e) => setToCurrency(e.target.value)}
